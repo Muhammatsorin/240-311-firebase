@@ -1,54 +1,55 @@
 import React from 'react';
-import { useState , useEffect } from "react"
+import { useState, useEffect } from "react"
 import styled from "styled-components"
 import { firestore } from './index'
+import TaskList from './TaskList'
 
 const App = () => {
 
   const [tasks, setTasks] = useState([
-    
+
   ])
 
-  const [name , setName] = useState(" ")
+  const [name, setName] = useState(" ")
 
-  useEffect( () => {
+  useEffect(() => {
     retriveData()
-  },[])
-  
+  }, [])
+
   const retriveData = () => {
-    firestore.collection("Tasks").onSnapshot( (snapshot) => {
+    firestore.collection("Tasks").onSnapshot((snapshot) => {
       let myTask = snapshot.docs.map((d) => {
-        const {id , name} = d.data()
-        console.log(id , name)
-        return {id , name}
+        const { id, name } = d.data()
+        console.log(id, name)
+        return { id, name }
       })
       setTasks(myTask)
     })
   }
 
   const createTask = () => {
-    let id = (tasks.length === 0)? 1 : tasks[tasks.length-1].id + 1
-    firestore.collection("Tasks").doc(id+"").set({id, name}) 
+    let id = (tasks.length === 0) ? 1 : tasks[tasks.length - 1].id + 1
+    firestore.collection("Tasks").doc(id + "").set({ id, name })
   }
 
   const deleteTask = (id) => {
-    firestore.collection("Tasks").doc(id+"").delete()
+    firestore.collection("Tasks").doc(id + "").delete()
   }
 
   const updateTask = (id) => {
-    firestore.collection("Tasks").doc(id+"").set({id , name})
-  } 
-           
+    firestore.collection("Tasks").doc(id + "").set({ id, name })
+  }
+
   const renderTask = () => {
     if (tasks && tasks.length) {
       return (
         tasks.map((tasks, index) => {
           return (
-            <li key={index}>
-              {tasks.id} : {tasks.name}
-              <button onClick={() => deleteTask(tasks.id)}>Delete</button>
-              <button onClick={() => updateTask(tasks.id)}>Update</button>
-            </li>
+            <TaskList key={index}
+              task={tasks}
+              deleteTask={deleteTask}
+              updateTask={updateTask}
+            />
           )
         })
       )
@@ -69,11 +70,14 @@ const App = () => {
       </div>
       <div className="todo-list">
         <h3>-- TODO LIST --</h3>
-        <input type="text" name="name" onChange={ (e) => setName(e.target.value)}/>
+        <input type="text" name="name" onChange={(e) => setName(e.target.value)} />
         <button onClick={createTask}>SUBMIT</button>
-        <ul>
-          {renderTask()}
-        </ul>
+        <div className="ul-list">
+          <ul>
+            {renderTask()}
+          </ul>
+        </div>
+
       </div>
 
     </StyledWrapper>
@@ -82,7 +86,7 @@ const App = () => {
 
 const StyledWrapper = styled.div`
   .title {
-    text-align: center
+    text-align: center;
   }
 
   .todo-list {
@@ -93,5 +97,11 @@ const StyledWrapper = styled.div`
     color: red;
   }
 
+  ul {
+    display: flex;
+    list-style: none;
+    margin-top: 20px;
+    padding-left: 0px;
+  }
 `
 export default App;
