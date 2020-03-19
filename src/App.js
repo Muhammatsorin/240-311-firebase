@@ -1,26 +1,85 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { useState , useEffect } from "react"
+import styled from "styled-components"
+import { firestore } from './index'
 
-function App() {
+const App = () => {
+
+  const [tasks, setTasks] = useState([
+    {
+      id: 1,
+      name: "MUHAMMATSORIN HAWAE"
+    },
+    {
+      id: 2,
+      name: "FARUM OBIAS"
+    }
+  ])
+
+  useEffect( () => {
+    retriveData()
+  },[])
+
+  const retriveData = () => {
+    firestore.collection("Tasks").onSnapshot( (snapshot) => {
+      snapshot.docs.map((data) => {
+        const {id , name} = data.data()
+        console.log(id , name)
+      })
+    })
+  }
+
+  const renderTask = () => {
+    if (tasks && tasks.length) {
+      return (
+        tasks.map((tasks, index) => {
+          return (
+            <li key={index}>
+              {tasks.id} : {tasks.name}
+            </li>
+          )
+        })
+      )
+    }
+    else {
+      return (
+        <li>No Tasks</li>
+      )
+    }
+
+
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    <StyledWrapper>
+      <div className="title">
+        <h1>240 - 311 : LAB FIREBASE</h1>
+        <h2>BY : 5935512045 MUHAMMATSORIN  HAWAE</h2>
+        <p>--------------------------------------------------------------------------------</p>
+      </div>
+      <div className="todo-list">
+        <h3>-- TODO LIST --</h3>
+        <ul>
+          {renderTask()}
+        </ul>
+      </div>
+
+    </StyledWrapper>
+  )
 }
 
+const StyledWrapper = styled.div`
+  .title {
+    text-align: center
+  }
+
+  .todo-list {
+    margin-left: 20px;
+  }
+
+  h1 {
+    color: red;
+  }
+
+`
 export default App;
