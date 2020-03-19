@@ -22,10 +22,12 @@ const App = () => {
 
   const retriveData = () => {
     firestore.collection("Tasks").onSnapshot( (snapshot) => {
-      snapshot.docs.map((data) => {
+      let myTask = snapshot.docs.map((data) => {
         const {id , name} = data.data()
         console.log(id , name)
+        return {id , name}
       })
+      setTasks(myTask)
     })
   }
 
